@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link, NavLink, Outlet } from 'react-router-dom'
 
 const HostVanDetails = () => {
 
@@ -17,11 +17,22 @@ const HostVanDetails = () => {
     return <h1>Loading... </h1>
   }
 
-  
+  const activeStyles = {
+        fontWeight: "bold",
+        textDecoration: "underline",
+        color: "#161616"
+  }
 
   return (
     <>
     <section>
+            <Link to=".."
+            relative="path"
+            className="back-button">
+              &larr;<span> Back to all Vans</span>
+            </Link>
+
+
             <div className="host-van-detail-layout-container">
                 <div className="host-van-detail">
                     <img src={currentVan.imageUrl} />
@@ -35,6 +46,28 @@ const HostVanDetails = () => {
                         <h4>${currentVan.price}/day</h4>
                     </div>
                 </div>
+
+                <nav className="host-van-detail-nav">
+                  <NavLink to="."
+                   end
+                   style={({isActive})=> isActive ? activeStyles: null}
+                  >
+                    Details
+                  </NavLink>
+
+                  <NavLink to="pricing"
+                  style={({isActive})=> isActive ? activeStyles: null}
+                  >
+                    Pricing
+                  </NavLink>
+
+                  <NavLink to="photos"
+                  style={({isActive})=> isActive ? activeStyles: null}
+                  >
+                    Photos
+                  </NavLink>
+                </nav>
+                <Outlet context ={{currentVan}}/>
             </div>
         </section>
       
