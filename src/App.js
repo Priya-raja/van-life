@@ -15,6 +15,7 @@ import HostVanDetails from './pages/Host/HostVanDetails';
 import HostVanInfo from './pages/Host/HostVanInfo';
 import HostVanPricing from './pages/Host/HostVanPricing';
 import HostVanPhotos from './pages/Host/HostVanPhotos';
+import NotFoundPage from './NotFoundPage';
 
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
             </Route>
          <Route path="reviews" element={<Reviews />}/>
         </Route> 
-     
+       <Route path="*" element={<NotFoundPage/>}/>
       </Route>
       
     </Routes>
