@@ -249,6 +249,12 @@ footer {
   background-color: #E17654;
 }
 
+.van-type.simple::selected{
+  background-color: #E17654;
+  color: white
+}
+
+
 .van-type.rugged:hover, .van-type.rugged.selected {
   background-color: #115E59;
 }
