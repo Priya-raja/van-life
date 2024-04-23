@@ -3,7 +3,6 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import '../server.js'
 import { Link, useSearchParams } from 'react-router-dom'
-import {getVans} from '../api.js'
 
 const Vans = () => {
 
@@ -11,16 +10,11 @@ const Vans = () => {
     const [vans, setVans] = useState([])
 
     const typeFilter = searchParams.get("type")
-
- 
     
     useEffect(() => {
-        async function loadVans() {
-          const data =  await getVans()
-          setVans(data)
-
-        }
-        loadVans()
+        fetch("/api/vans")
+            .then(res => res.json())
+            .then(data => setVans(data.vans))
     }, [])
 
     const displayedVans = typeFilter ?
@@ -54,7 +48,10 @@ const Vans = () => {
     const vanElements = displayedVans.map(van => (
         <div key={van.id} className="van-tile">
         <Link to={van.id}
-         state={{ search: `?${searchParams.toString()}`, type: typeFilter }}
+         state={{ 
+            search: `?${searchParams.toString()}`, //you will get like queryparameters '?type=luxury'
+            type: typeFilter 
+        }} 
         >
         <img src={van.imageUrl} />
         <div className="van-info">
@@ -73,7 +70,8 @@ const Vans = () => {
             <h1>Explore our van options</h1>
 
             <div className="van-list-filter-buttons">
-            <button
+                {/* //instead of button if link then use genNewSearchParamString function */}
+                   <button
                     onClick={() => handleFilterChange("type", "simple")}
                     className={
                         `van-type simple ${typeFilter === "simple" ? "selected" : ""}`
