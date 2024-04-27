@@ -1,55 +1,79 @@
 import React,{useState} from 'react'
-import { useNavigate, useLocation } from "react-router-dom"
+
+import { useNavigate, useLocation} from "react-router-dom";
 import { loginUser } from "../api"
 
-const Login = () => {
-    const [loginFormData, setLoginFormData]  = useState({email:'',password:''})
+export default function Login() {
+    const [loginFormData, setLoginFormData] = useState({ email: "", password: "" })
+    const [status, setStatus] = useState("idle")
+    const [error, setError] = useState(null)
+
     const location = useLocation()
+    const navigate = useNavigate()
+    const from = location.state?.from || "/host";
+
     function handleSubmit(e) {
         e.preventDefault()
+        setStatus("submitting")
         loginUser(loginFormData)
-            .then(data => console.log(data))
-        
+            .then(data => {
+                setError(null)
+                localStorage.setItem("loggedin", true)
+                navigate(from, { replace: true })
+            })
+            .catch(err => {
+                setError(err)
+            })
+            .finally(() => {
+                setStatus("idle")
+            })
     }
 
-    const handleChange =(e) =>{
-     const {name,  value } = e.target
-     setLoginFormData(prev => ({
-        ...prev,
-        [name]:value
-     }))
+    function handleChange(e) {
+        const { name, value } = e.target
+        setLoginFormData(prev => ({
+            ...prev,
+            [name]: value
+        }))
     }
-  return (
-    <div className="login-container">
 
+    return (
+        <div className="login-container">
             {
                 location.state?.message &&
-                <h3 className="login-first">{location.state.message}</h3>
+                    <h3 className="login-error">{location.state.message}</h3>
             }
             <h1>Sign in to your account</h1>
-        <form onSubmit={handleSubmit} className="login-form">
-          
-            <input 
-            type="email"
-            name="email"
-            onChange={handleChange}
-            placeholder="Email Address"
-            value={loginFormData.email}
-            />
-            
-            <input 
-            type="password"
-            name="password"
-            onChange={handleChange}
-            placeholder="Password"
-            value={loginFormData.password}
-            />
-           
-            <button>Log in</button>
-        </form>
-      
-    </div>
-  )
-}
+            {
+                error?.message &&
+                    <h3 className="login-error">{error.message}</h3>
+            }
 
-export default Login
+            <form onSubmit={handleSubmit} className="login-form">
+                <input
+                    name="email"
+                    onChange={handleChange}
+                    type="email"
+                    placeholder="Email address"
+                    value={loginFormData.email}
+                />
+                <input
+                    name="password"
+                    onChange={handleChange}
+                    type="password"
+                    placeholder="Password"
+                    value={loginFormData.password}
+                />
+                <button
+                    disabled={status === "submitting"}
+                >
+                    {status === "submitting"
+                        ? "Logging in..."
+                        : "Log in"
+                    }
+                </button>
+            </form>
+        </div>
+    )
+
+}
