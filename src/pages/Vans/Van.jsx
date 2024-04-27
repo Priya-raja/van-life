@@ -1,20 +1,32 @@
 import { Server } from 'miragejs'
 import React from 'react'
 import { useState, useEffect } from 'react'
-import '../server.js'
+import '../../server.js'
 import { Link, useSearchParams } from 'react-router-dom'
+import { getVans } from "../../api"
 
 const Vans = () => {
 
     const [searchParams, setSearchParams] = useSearchParams()
     const [vans, setVans] = useState([])
-
+    const [loading, setLoading] = React.useState(false)
+    const [error, setError] = React.useState(null)
     const typeFilter = searchParams.get("type")
     
     useEffect(() => {
-        fetch("/api/vans")
-            .then(res => res.json())
-            .then(data => setVans(data.vans))
+        async function loadVans() {
+            setLoading(true)
+            try {
+                const data = await getVans()
+                setVans(data)
+            } catch (err) {
+                setError(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadVans()
     }, [])
 
     const displayedVans = typeFilter ?
@@ -63,6 +75,13 @@ const Vans = () => {
     </div>
     ))
 
+    if (loading) {
+        return <h1>Loading...</h1>
+    }
+    
+    if (error) {
+        return <h1>There was an error: {error.message}</h1>
+    }
 
 
     return (
