@@ -1,4 +1,4 @@
-import { Server } from 'miragejs'
+
 import React from 'react'
 import { useState, useEffect } from 'react'
 import '../../server.js'
@@ -32,15 +32,15 @@ const Vans = () => {
     const displayedVans = typeFilter ?
     vans.filter(van=> van.type === typeFilter) :vans
 
-    function genNewSearchParamString(key, value) {
-        const sp = new URLSearchParams(searchParams)
-        if (value === null) {
-          sp.delete(key)
-        } else {
-          sp.set(key, value)
-        }
-        return `?${sp.toString()}`
-      }
+    // function genNewSearchParamString(key, value) {
+    //     const sp = new URLSearchParams(searchParams)
+    //     if (value === null) {
+    //       sp.delete(key)
+    //     } else {
+    //       sp.set(key, value)
+    //     }
+    //     return `?${sp.toString()}`
+    //   }
       //inLinks use this
     //   <Link to={genNewSearchParamString("type", "jedi")}>Jedi</Link>
     //     <Link to={genNewSearchParamString("type", null)}>Clear</Link>
@@ -65,7 +65,7 @@ const Vans = () => {
             type: typeFilter 
         }} 
         >
-        <img src={van.imageUrl} />
+        <img src={van.imageUrl} alt="van" />
         <div className="van-info">
             <h3>{van.name}</h3>
             <p>${van.price}<span>/day</span></p>
