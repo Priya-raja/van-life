@@ -1,3 +1,7 @@
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(() => resolve(), ms))
+}
+
 export async function getVans(id) {
     const url = id ? `/api/vans/${id}` : "/api/vans"
     const res = await fetch(url)
