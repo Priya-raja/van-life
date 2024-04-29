@@ -41,6 +41,7 @@ function fakeLogOut() {
                     <img 
                         src={imageUrl}
                         className="login-icon"
+                        alt="avatar"
                     />
                 </Link> 
                 <button onClick={fakeLogOut}>X</button>

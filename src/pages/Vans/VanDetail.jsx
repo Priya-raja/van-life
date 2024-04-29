@@ -48,7 +48,7 @@ export default function VanDetail() {
 
             {van && (
                 <div className="van-detail">
-                    <img src={van.imageUrl} />
+                    <img src={van.imageUrl} alt ="vans"/>
                     <i className={`van-type ${van.type} selected`}>{van.type}</i>
                     <h2>{van.name}</h2>
                     <p className="van-price"><span>${van.price}</span>/day</p>
