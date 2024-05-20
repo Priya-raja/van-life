@@ -2,8 +2,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore,collection,doc,getDocs,getDoc } from "firebase/firestore/lite"
-import { getAnalytics } from "firebase/analytics";
-
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -17,30 +15,43 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app)
 
 const vansCollectionRef = collection(db, "vans")
 
 export async function getVans() {
 
+    try{
+
+    
     const snapshot = await getDocs(vansCollectionRef)
     const vans = snapshot.docs.map(doc => ({
         ...doc.data(),
         id: doc.id
     }))
     return vans
-   }
-   
+   } catch (error) {
+    console.error("Error fetching vans:", error);
+    throw new Error("Failed to fetch vans.");
+  }
+}
 
 export async function getVan(id) {
-    const docRef = doc(db, "vans", id)
-    const snapshot = await getDoc(docRef)
-    return {
-        ...snapshot.data(),
-        id: snapshot.id
+    try {
+        const docRef = doc(db, "vans", id);
+        const snapshot = await getDoc(docRef);
+        if (!snapshot.exists()) {
+          throw new Error(`No such document with ID ${id}`);
+        }
+        return {
+          ...snapshot.data(),
+          id: snapshot.id
+        };
+      } catch (error) {
+        console.error("Error fetching van:", error);
+        throw new Error("Failed to fetch van.");
+      }
     }
-}
 
 
 // export async function getVans(id) {
@@ -58,15 +69,18 @@ export async function getVan(id) {
 // }
 
 export async function getHostVans(id) { 
-
-    const snapshot = await getDocs(vansCollectionRef)
-    const vans = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
-    return vans
-
-}
+    try {
+        const snapshot = await getDocs(vansCollectionRef);
+        const vans = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        }));
+        return vans;
+      } catch (error) {
+        console.error("Error fetching host vans:", error);
+        throw new Error("Failed to fetch host vans.");
+      }
+    }
 // export async function getHostVans(id) {
 //     const url = id ? `/api/host/vans/${id}` : "/api/host/vans"
 //     const res = await fetch(url)
@@ -82,18 +96,24 @@ export async function getHostVans(id) {
 // }
 
 export async function loginUser(creds) {
+    try {
     const res = await fetch("/api/login",
-        { method: "post", body: JSON.stringify(creds) }
+        { 
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify(creds) 
+        }
     )
     const data = await res.json()
 
     if (!res.ok) {
-        throw {
-            message: data.message,
-            statusText: res.statusText,
-            status: res.status
-        }
+        throw new Error(data.message || "Failed to login.");
+      }
+      return data;
+    } catch (error) {
+      console.error("Error logging in:", error);
+      throw new Error("Failed to login.");
     }
-
-    return data
 }
