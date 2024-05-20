@@ -4,15 +4,16 @@ import { initializeApp } from "firebase/app";
 import { getFirestore,collection,doc,getDocs,getDoc } from "firebase/firestore/lite"
 import { getAnalytics } from "firebase/analytics";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBaSuTaxQyyhk0R07EAYpt_9k61kgqgLes",
-  authDomain: "vanlife-ff77f.firebaseapp.com",
-  projectId: "vanlife-ff77f",
-  storageBucket: "vanlife-ff77f.appspot.com",
-  messagingSenderId: "874316680029",
-  appId: "1:874316680029:web:25a67a65cdedcbb2c576b4",
-  measurementId: "G-4EGBRSS2M0"
-};
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -21,27 +22,39 @@ const db = getFirestore(app)
 
 const vansCollectionRef = collection(db, "vans")
 
-// function sleep(ms) {
-//     return new Promise(resolve => setTimeout(() => resolve(), ms))
-// }
-
 export async function getVans() {
+
+    try{
+
+    
     const snapshot = await getDocs(vansCollectionRef)
     const vans = snapshot.docs.map(doc => ({
         ...doc.data(),
         id: doc.id
     }))
     return vans
+   } catch (error) {
+    console.error("Error fetching vans:", error);
+    throw new Error("Failed to fetch vans.");
+  }
 }
 
 export async function getVan(id) {
-    const docRef = doc(db, "vans", id)
-    const snapshot = await getDoc(docRef)
-    return {
-        ...snapshot.data(),
-        id: snapshot.id
+    try {
+        const docRef = doc(db, "vans", id);
+        const snapshot = await getDoc(docRef);
+        if (!snapshot.exists()) {
+          throw new Error(`No such document with ID ${id}`);
+        }
+        return {
+          ...snapshot.data(),
+          id: snapshot.id
+        };
+      } catch (error) {
+        console.error("Error fetching van:", error);
+        throw new Error("Failed to fetch van.");
+      }
     }
-}
 
 
 // export async function getVans(id) {
@@ -59,15 +72,18 @@ export async function getVan(id) {
 // }
 
 export async function getHostVans(id) { 
-    
-    const snapshot = await getDocs(vansCollectionRef)
-    const vans = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
-    return vans
-
-}
+    try {
+        const snapshot = await getDocs(vansCollectionRef);
+        const vans = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        }));
+        return vans;
+      } catch (error) {
+        console.error("Error fetching host vans:", error);
+        throw new Error("Failed to fetch host vans.");
+      }
+    }
 // export async function getHostVans(id) {
 //     const url = id ? `/api/host/vans/${id}` : "/api/host/vans"
 //     const res = await fetch(url)
@@ -84,7 +100,13 @@ export async function getHostVans(id) {
 
 export async function loginUser(creds) {
     const res = await fetch("/api/login",
-        { method: "post", body: JSON.stringify(creds) }
+        { 
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify(creds) 
+        }
     )
     const data = await res.json()
 
