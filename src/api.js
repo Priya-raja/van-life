@@ -2,8 +2,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore,collection,doc,getDocs,getDoc } from "firebase/firestore/lite"
-import { getAnalytics } from "firebase/analytics";
-
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -17,7 +15,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app)
 
 const vansCollectionRef = collection(db, "vans")
@@ -99,6 +96,7 @@ export async function getHostVans(id) {
 // }
 
 export async function loginUser(creds) {
+    try {
     const res = await fetch("/api/login",
         { 
             method: "POST", 
@@ -111,12 +109,11 @@ export async function loginUser(creds) {
     const data = await res.json()
 
     if (!res.ok) {
-        throw {
-            message: data.message,
-            statusText: res.statusText,
-            status: res.status
-        }
+        throw new Error(data.message || "Failed to login.");
+      }
+      return data;
+    } catch (error) {
+      console.error("Error logging in:", error);
+      throw new Error("Failed to login.");
     }
-
-    return data
 }
